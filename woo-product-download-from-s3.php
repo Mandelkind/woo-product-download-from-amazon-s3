@@ -388,6 +388,13 @@
 					]
 				]);
 
+				// needed for Google Cloud Storage
+				// see https://stackoverflow.com/questions/47264520/unable-to-listobjects-from-gcs-bucket
+				$middleware = Aws\Middleware::tap(function ($command, $request = null) {
+					unset($command['EncodingType']);
+				});
+				$s3->getHandlerList()->appendInit($middleware, 'encode-type-interceptor');
+
 				$objects = $s3->getIterator('ListObjects', array('Bucket' => $this->bucket));
 				$results = array();
 
